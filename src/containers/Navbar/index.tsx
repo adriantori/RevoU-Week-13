@@ -23,7 +23,7 @@ const items: MenuProps['items'] = [
 const Navbar = () => {
 
     return (
-        <Menu mode="horizontal" items={items} style={{ height: '10vh', alignItems:'center'}}/>
+        <Menu mode="horizontal" items={items} style={{ height: '8vh', alignItems:'center'}}/>
     )
 }
 

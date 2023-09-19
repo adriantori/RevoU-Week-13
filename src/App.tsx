@@ -9,7 +9,7 @@ function App() {
       <Affix offsetTop={0}>
         < Navbar />
       </Affix>
-      <Space direction="horizontal" style={{ height: '80vh', justifyContent: 'center', alignContent: 'center' }}>
+      <Space direction="horizontal" style={{ height: '84vh', justifyContent: 'center', alignContent: 'center' }}>
         < Datas />
       </Space>
       <Affix offsetBottom={0}>

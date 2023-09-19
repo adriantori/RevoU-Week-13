@@ -31,6 +31,11 @@ const columns: ColumnsType<DataType> = [
             <span>{isActive ? 'Active' : 'Deactive'}</span>
         ),
         sorter: (a) => (a.is_active ? 1 : -1),
+        filters: [
+            { text: 'Active', value: true },
+            { text: 'Deactive', value: false },
+        ],
+        onFilter: (value, record) => record.is_active === value,
     },
     {
         title: 'Action',
@@ -58,20 +63,50 @@ const data: DataType[] = [
         name: "mock category B",
         is_active: false,
     },
+    {
+        key: '2',
+        id: "ef2f13eb-a99c-4c0f-91c8-d3qwe3c390a3286",
+        name: "mock category B",
+        is_active: false,
+    },
+    {
+        key: '3',
+        id: "ef2f13eb-a99c-4c0f-91c8-d3qwe3c390a3286",
+        name: "mock category B",
+        is_active: false,
+    },
+    {
+        key: '4',
+        id: "ef2f13eb-a99c-4c0f-91c8-d3qwe3c390a3286",
+        name: "mock category B",
+        is_active: false,
+    },
+    {
+        key: '5',
+        id: "ef2f13eb-a99c-4c0f-91c8-d3qwe3c390a3286",
+        name: "mock category B",
+        is_active: false,
+    },
 ];
 
 const Datas: React.FC = () => {
 
     return (
-        <Card title="List of Category" style={{ height: '78vh' }}>
-            <Table columns={columns} dataSource={data} />
-
-                <Space direction="horizontal" size="middle" style={{ 
-                    display: 'flex', justifyContent: 'space-evenly', width: '100%', position: 'absolute', bottom:'20px'
-                }}>
-                    <Button>Add Item</Button>
-                    <Button danger>Log Out</Button>
-                </Space>
+        <Card title="List of Category" style={{ height: '82vh' }} extra={
+            <Space direction="horizontal" size="middle">
+                <Button>Add Item</Button>
+                <Button danger>Log Out</Button>
+            </Space>
+        }>
+            <Table
+                columns={columns}
+                dataSource={data}
+                pagination={{
+                    defaultPageSize: 5,
+                    total: data.length,
+                    position: ['topCenter']
+                }}
+            />
         </Card>
     )
 }
