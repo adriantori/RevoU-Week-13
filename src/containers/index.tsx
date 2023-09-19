@@ -1,0 +1,7 @@
+export { default as Login } from './Login'
+export { default as Register } from './Register'
+export { default as AddItem } from './AddItem'
+export { default as EditItem } from './EditItem'
+export { default as Datas } from './Datas'
+export { default as Navbar } from './Navbar'
+export { default as Footer } from './Footer'
