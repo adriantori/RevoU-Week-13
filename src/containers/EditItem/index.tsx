@@ -1,5 +1,6 @@
 import { Button, Form, Input, Space, Card, Select } from 'antd';
 import { useFormik } from 'formik';
+import { useNavigate } from 'react-router-dom';
 import * as yup from 'yup';
 
 interface AccountLogin {
@@ -18,6 +19,8 @@ const validationSchema = yup.object({
 })
 
 const EditItem: React.FC = () => {
+
+    const navigate = useNavigate();
 
     const handleSubmit = (values: AccountLogin) => {
         console.log(values);
@@ -60,8 +63,11 @@ const EditItem: React.FC = () => {
                     </Select>
                 </Form.Item>
                 <Space direction="horizontal" size="middle" style={{ display: 'flex', justifyContent: 'space-around', width: "100%" }}>
-                    <Button type="primary" htmlType="submit" className="login-form-button" style={{ width: "200px" }}>
+                    <Button type="primary" htmlType="submit" style={{ width: "200px" }}>
                         Submit
+                    </Button>
+                    <Button onClick={() => {navigate('/')}} danger style={{ width: "200px" }}>
+                        Return
                     </Button>
                 </Space>
             </Form>

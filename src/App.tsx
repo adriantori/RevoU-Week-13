@@ -1,21 +1,41 @@
-import { Affix, Layout, Space } from 'antd'
-import './App.css'
-import { Datas, Navbar, Footer } from './containers'
+import { createBrowserRouter, RouterProvider } from 'react-router-dom'
+import { PublicLayout } from './layouts'
+import { DatasPage, LoginPage, RegisterPage, AddItemPage, EditItemPage } from './pages'
+import AppProvider from './Provider/AppProvider'
 
 function App() {
+  const router = createBrowserRouter([
+    {
+      element: <PublicLayout />,
+      children: [
+        {
+          path: '/',
+          element: <DatasPage />
+        },
+        {
+          path: '/login',
+          element: <LoginPage />
+        },
+        {
+          path: '/register',
+          element: <RegisterPage />
+        },
+        {
+          path: '/add',
+          element: <AddItemPage />
+        },
+        {
+          path: '/edit/:id',
+          element: <EditItemPage />
+        },
+      ]
+    }
+  ])
 
   return (
-    <Layout style={{ width: '100%', height:'100%', background:'teal' }}>
-      <Affix offsetTop={0}>
-        < Navbar />
-      </Affix>
-      <Space direction="horizontal" style={{ height: '84vh', justifyContent: 'center', alignContent: 'center' }}>
-        < Datas />
-      </Space>
-      <Affix offsetBottom={0}>
-        < Footer />
-      </Affix>
-    </Layout>
+    <AppProvider>
+      <RouterProvider router={router} />
+    </AppProvider> 
   )
 }
 

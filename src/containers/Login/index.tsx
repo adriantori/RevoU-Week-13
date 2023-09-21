@@ -4,6 +4,7 @@ import { useFormik } from 'formik';
 import * as yup from 'yup';
 
 import { Text } from '../../components';
+import { useNavigate } from 'react-router-dom';
 
 interface AccountLogin {
     username: string;
@@ -24,6 +25,8 @@ const validationSchema = yup.object({
 })
 
 const Login: React.FC = () => {
+
+    const navigate = useNavigate();
 
     const handleSubmit = (values: AccountLogin) => {
         console.log(values);
@@ -73,7 +76,7 @@ const Login: React.FC = () => {
                     <Button type="primary" htmlType="submit" className="login-form-button">
                         Log in
                     </Button>
-                    <a href=""><Button type="default" className="login-form-button">register now!</Button></a>
+                    <Button onClick={() => {navigate('/register')}} type="default" className="login-form-button">register now!</Button>
                 </Space>
             </Form>
         </Card>

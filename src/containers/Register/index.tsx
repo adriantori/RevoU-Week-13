@@ -1,30 +1,38 @@
 import { LockOutlined, UserOutlined } from '@ant-design/icons';
 import { Button, Form, Input, Space, Card } from 'antd';
 import { useFormik } from 'formik';
+import { useNavigate } from 'react-router-dom';
 import * as yup from 'yup';
 
 interface AccountRegister {
     name: string;
-    username: string;
+    email: string;
     password: string;
 }
 
 const initialValues = {
     name: '',
-    username: '',
+    email: '',
     password: ''
 }
 
 const validationSchema = yup.object({
     name: yup.string().required('Name must exist'),
-    username: yup.string().required('Username must exist'),
+    email: yup.string()
+        .email('Invalid email format')
+        .matches(/^[^\s@]+@[^\s@]+\.[^\s@]+$/, 'Invalid email format. Must include domain.')
+        .required('Email must exist'),
     password: yup.string().required('Password must exist')
 })
 
 const Register: React.FC = () => {
 
-    const handleSubmit = (values: AccountRegister) => {
-        console.log(values);
+    const navigate = useNavigate();
+
+    function handleSubmit(values: AccountRegister) {
+        if (formik.isValid) {
+            console.log(values);
+        }
     }
 
     const formik = useFormik({
@@ -32,7 +40,6 @@ const Register: React.FC = () => {
         onSubmit: handleSubmit,
         validationSchema: validationSchema
     })
-
 
     return (
         <Card title="Please Register To Our Platform" headStyle={{ textAlign: 'center' }} style={{ width: '60vw' }}>
@@ -50,16 +57,20 @@ const Register: React.FC = () => {
                     />
                 </Form.Item>
                 <Form.Item
-                    name="username"
-                    rules={[{ required: true, message: 'Please input your Username!' }]}
+                    name="email"
+                    hasFeedback
+                    validateStatus={formik.touched.email && formik.errors.email ? 'error' : 'success'}
+                    help={formik.touched.email && formik.errors.email ? formik.errors.email : 'Make sure the format is correct (mail@email.com)'}
                 >
-                    <Input
-                        prefix={<UserOutlined className="site-form-item-icon" />}
-                        placeholder="Username"
-                        value={formik.values.username}
-                        onChange={formik.handleChange('username')}
-                        status={formik.errors.username && 'error'}
-                    />
+                    <>
+                        <Input
+                            prefix={<UserOutlined className="site-form-item-icon" />}
+                            placeholder="Email"
+                            value={formik.values.email}
+                            onChange={formik.handleChange('email')}
+                        />
+                    </>
+
                 </Form.Item>
                 <Form.Item
                     name="password"
@@ -75,10 +86,10 @@ const Register: React.FC = () => {
                     />
                 </Form.Item>
                 <Space direction="horizontal" size="middle" style={{ display: 'flex', justifyContent: 'space-around' }}>
-                    <Button type="primary" htmlType="submit" className="login-form-button">
+                    <Button type="primary" htmlType="submit">
                         Register
                     </Button>
-                    <a href=""><Button type="default" className="login-form-button">Login now!</Button></a>
+                    <Button onClick={() => {navigate('/login')}} type="default">Login now!</Button>
                 </Space>
             </Form>
         </Card>

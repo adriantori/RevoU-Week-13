@@ -1,0 +1,5 @@
+export { default as LoginPage } from './LoginPage'
+export { default as RegisterPage } from './RegisterPage'
+export { default as AddItemPage } from './AddItemPage'
+export { default as EditItemPage } from './EditItemPage'
+export { default as DatasPage } from './DatasPage'

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Button, Card, Space, Table } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
+import { useNavigate } from 'react-router-dom';
 
 interface DataType {
     key: string;
@@ -91,11 +92,17 @@ const data: DataType[] = [
 
 const Datas: React.FC = () => {
 
+    const navigate = useNavigate();
+
+    const logout = () => {
+
+    }
+    
     return (
         <Card title="List of Category" style={{ height: '82vh' }} extra={
             <Space direction="horizontal" size="middle">
-                <Button>Add Item</Button>
-                <Button danger>Log Out</Button>
+                <Button onClick={() => {navigate('/addItem')}}>Add Item</Button>
+                <Button onClick={logout}danger>Log Out</Button>
             </Space>
         }>
             <Table
