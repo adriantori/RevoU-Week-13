@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import { useCallback, useContext, useEffect } from 'react';
 import { Button, Card, Space, Table } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { useNavigate } from 'react-router-dom';
+import { AppContext } from '../../Provider/AppProvider';
 
 interface Category {
     key: string;
@@ -11,52 +12,76 @@ interface Category {
 }
 
 interface GetCategoryResponse {
-    categories:Category[],
+    data: Category[],
     currentPage: number,
     totalItem: number,
     totalPage: number
 }
 
-const data: Category[] = [
-    {
-        key: '0',
-        id: "ef2f13eb-a99c-4c0f-91c8-asdd33c390a3286",
-        name: "mock category A",
-        is_active: true,
-    },
-    {
-        key: '1',
-        id: "ef2f13eb-a99c-4c0f-91c8-d3qwe3c390a3286",
-        name: "mock category B",
-        is_active: false,
-    },
-    {
-        key: '2',
-        id: "ef2f13eb-a99c-4c0f-91c8-d3qwe3c390a3286",
-        name: "mock category B",
-        is_active: false,
-    },
-    {
-        key: '3',
-        id: "ef2f13eb-a99c-4c0f-91c8-d3qwe3c390a3286",
-        name: "mock category B",
-        is_active: false,
-    },
-    {
-        key: '4',
-        id: "ef2f13eb-a99c-4c0f-91c8-d3qwe3c390a3286",
-        name: "mock category B",
-        is_active: false,
-    },
-    {
-        key: '5',
-        id: "ef2f13eb-a99c-4c0f-91c8-d3qwe3c390a3286",
-        name: "mock category B",
-        is_active: false,
-    },
-];
-
 const Datas: React.FC = () => {
+
+    const { categories, setCategories } = useContext(AppContext);
+    const navigate = useNavigate();
+
+    const getCategoryList = useCallback(
+        async () => {
+            const token = localStorage.getItem('token');
+
+            // If token doesn't exist, redirect to login
+            if (!token) {
+                alert("Please login beforehand")
+                navigate('/login');
+            }
+
+            const fetching = await fetch('https://mock-api.arikmpt.com/api/category', {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+            const response: GetCategoryResponse = await fetching.json();
+
+            const categorizedData = response.data.map(category => ({
+                ...category,
+                key: category.name
+            }));
+            setCategories(categorizedData ?? []);
+        },
+        [navigate, setCategories]
+    )
+    useEffect(
+        () => {
+            getCategoryList()
+        },
+        [getCategoryList]
+    )
+
+    const deleteItem = async (recordId: string) => {
+        try {
+            const token = localStorage.getItem('token');
+
+            console.log(recordId);
+            const fetching = await fetch(`https://mock-api.arikmpt.com/api/category/${recordId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            if (!fetching.ok) {
+                throw new Error('Error deleting category');
+            }
+            alert('Data deleted');
+
+            getCategoryList()
+        } catch (error) {
+            alert('Something gone wrong when you tried to annihilate the data');
+        }
+    }
+
+    const handleLogout = () => {
+        alert("goodbye!")
+        localStorage.removeItem('token');
+        navigate('/login');
+    }
 
     const columns: ColumnsType<Category> = [
         {
@@ -98,36 +123,12 @@ const Datas: React.FC = () => {
             onFilter: (value, record) => record.is_active === value,
         },
     ];
-    
-    const [categories, setCategories] = useState<Category[]>([]);
-    const navigate = useNavigate();
-
-    const getCategoryList = async () => {
-        const fetching = await fetch('https://mock-api.arikmpt.com/api/category')
-        const response: GetCategoryResponse = await fetching.json();
-        setCategories(response.categories ?? []);
-    }
-
-    useEffect(
-        () => {
-            getCategoryList()
-        },
-        []
-    )
-
-    const deleteItem = (recordId: string) => {
-        console.log(recordId);
-    }
-
-    const logout = () => {
-        console.log("logged out");
-    }
 
     return (
         <Card title="List of Category" style={{ height: '82vh' }} extra={
             <Space direction="horizontal" size="middle">
-                <Button onClick={() => {navigate('/add')}}>Add Item</Button>
-                <Button onClick={logout} danger>Log Out</Button>
+                <Button onClick={() => { navigate('/add') }}>Add Item</Button>
+                <Button onClick={handleLogout} danger>Log Out</Button>
             </Space>
         }>
             <Table
@@ -135,7 +136,7 @@ const Datas: React.FC = () => {
                 dataSource={categories}
                 pagination={{
                     defaultPageSize: 5,
-                    total: data.length,
+                    total: categories.length,
                     position: ['topCenter']
                 }}
             />

@@ -2,6 +2,8 @@ import { Button, Form, Input, Space, Card, Select } from 'antd';
 import { useFormik } from 'formik';
 import { useNavigate } from 'react-router-dom';
 import * as yup from 'yup';
+import { AppContext } from '../../Provider/AppProvider';
+import { useContext } from 'react';
 
 interface AccountLogin {
     name: string;
@@ -13,18 +15,31 @@ const initialValues = {
     status: ''
 }
 
-const validationSchema = yup.object({
-    name: yup.string().required(),
-    status: yup.string().required(),
-})
-
 const AddItem: React.FC = () => {
 
     const navigate = useNavigate();
-
+    
+    const { isNameUnique } = useContext(AppContext);
+      
     const handleSubmit = (values: AccountLogin) => {
         console.log(values);
     }
+
+    const nameUniquenessValidation = async (name: string) => {
+        return isNameUnique(name);
+      };
+      
+      const validationSchema = yup.object({
+        name: yup
+          .string()
+          .required('Name must exist')
+          .test('is-unique', 'Name must be unique', async function (value) {
+            if (!value) return false; 
+            const isUnique = await nameUniquenessValidation(value);
+            return isUnique;
+          }),
+        status: yup.string().required('Select one of the status'),
+      });
 
     const formik = useFormik({
         initialValues: initialValues,
@@ -39,7 +54,9 @@ const AddItem: React.FC = () => {
             <Form onFinish={formik.handleSubmit}>
                 <Form.Item
                     name="name"
-                    rules={[{ required: true, message: 'Name must exist' }]}
+                    hasFeedback
+                    validateStatus={formik.touched.name && formik.errors.name ? 'error' : 'success'}
+                    help={formik.touched.name && formik.errors.name ? formik.errors.name : ''}
                 >
                     <Input
                         placeholder="Name"

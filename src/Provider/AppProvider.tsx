@@ -1,33 +1,41 @@
-import { ReactNode, createContext, useState } from "react";
+import { ReactNode, createContext, useState, Dispatch, SetStateAction } from 'react';
 
-interface Token {
-    token?: string;
+interface CategoryData {
+  key: string;
+  id: string;
+  name: string;
+  is_active: boolean;
 }
 
-interface Context {
-    token?: Token
-    setToken?: React.Dispatch<React.SetStateAction<Token | undefined>>
+interface ContextProps {
+  categories: CategoryData[];
+  setCategories: Dispatch<SetStateAction<CategoryData[]>>;
+  isNameUnique: (name: string) => boolean;
+
 }
 
 interface Props {
-    children: ReactNode
+  children: ReactNode;
 }
 
-const defaultValue: Context = {
-    token: undefined
-}
+const defaultValue: ContextProps = {
+  categories: [],
+  setCategories: () => {},
+  isNameUnique: () => false
+};
 
-export const AppContext = createContext(defaultValue);
+export const AppContext = createContext<ContextProps>(defaultValue);
 
 const AppProvider = ({ children }: Props) => {
-
-    const [toket, setToken] = useState<Token>();
-
-    return (
-        <AppContext.Provider value={{ token: toket, setToken: setToken}}>
-            {children}
-        </AppContext.Provider>
-    )
-}
+  const [categories, setCategories] = useState<CategoryData[]>([]);
+  const isNameUnique = (name: string) => {
+    return categories.every(category => category.name !== name);
+  };
+  return (
+    <AppContext.Provider value={{ categories, setCategories, isNameUnique }}>
+      {children}
+    </AppContext.Provider>
+  );
+};
 
 export default AppProvider;

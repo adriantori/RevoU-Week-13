@@ -22,16 +22,39 @@ const validationSchema = yup.object({
         .email('Invalid email format')
         .matches(/^[^\s@]+@[^\s@]+\.[^\s@]+$/, 'Invalid email format. Must include domain.')
         .required('Email must exist'),
-    password: yup.string().required('Password must exist')
+    password: yup.string().required('Password must exist').min(8, 'Minimum of 8 characters')
 })
 
 const Register: React.FC = () => {
 
     const navigate = useNavigate();
 
-    function handleSubmit(values: AccountRegister) {
-        if (formik.isValid) {
-            console.log(values);
+    async function postRegisterData(values: AccountRegister) {
+        try {
+            const fetching = await fetch('https://mock-api.arikmpt.com/api/user/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(values)
+            });
+            if (!fetching.ok) {
+                throw new Error('Error registering user');
+            }
+            alert('Registration successful! Go ahead and login');
+            navigate('/login');
+        } catch (error) {
+            console.error('Error registering user:', error);
+        }
+    }
+
+    async function handleSubmit(values: AccountRegister) {
+        try {
+            if (formik.isValid) {
+                await postRegisterData(values);
+            }
+        } catch (error) {
+            console.error('Error in handleSubmit:', error);
         }
     }
 
@@ -60,7 +83,7 @@ const Register: React.FC = () => {
                     name="email"
                     hasFeedback
                     validateStatus={formik.touched.email && formik.errors.email ? 'error' : 'success'}
-                    help={formik.touched.email && formik.errors.email ? formik.errors.email : 'Make sure the format is correct (mail@email.com)'}
+                    help={formik.touched.email && formik.errors.email ? formik.errors.email : ''}
                 >
                     <>
                         <Input
@@ -74,7 +97,9 @@ const Register: React.FC = () => {
                 </Form.Item>
                 <Form.Item
                     name="password"
-                    rules={[{ required: true, message: 'Please input your Password!' }]}
+                    hasFeedback
+                    validateStatus={formik.touched.email && formik.errors.email ? 'error' : 'success'}
+                    help={formik.touched.email && formik.errors.email ? formik.errors.email : ''}
                 >
                     <Input
                         prefix={<LockOutlined className="site-form-item-icon" />}

@@ -2,34 +2,58 @@ import { LockOutlined, UserOutlined } from '@ant-design/icons';
 import { Button, Form, Input, Space, Card } from 'antd';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
-
-import { Text } from '../../components';
 import { useNavigate } from 'react-router-dom';
 
 interface AccountLogin {
-    username: string;
+    email: string;
     password: string;
 }
 
 const initialValues = {
-    username: '',
+    email: '',
     password: ''
 }
 
 const validationSchema = yup.object({
-    username: yup.string().required(),
-    password: yup.string().matches(
-        /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])(?=.{8,})/,
-        "Must Contain 8 Characters, One Uppercase, One Lowercase, One Number and One Special Case Character"
-    ),
+    email: yup.string().required(),
+    password: yup.string().required()
 })
 
 const Login: React.FC = () => {
 
     const navigate = useNavigate();
 
-    const handleSubmit = (values: AccountLogin) => {
-        console.log(values);
+    async function postLoginData(values: AccountLogin) {
+        try {
+            const fetching = await fetch('https://mock-api.arikmpt.com/api/user/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(values)
+            });
+            console.log(fetching)
+            if (!fetching.ok) {
+                throw new Error('Error login user');
+            }
+            const response = await fetching.json();
+            localStorage.setItem('token', response.data.token);
+            alert('Login successful!');
+            navigate('/');
+        } catch (error) {
+            alert('Some data is wrong');
+        }
+    }
+
+    async function handleSubmit(values: AccountLogin) {
+        try {
+            if (formik.isValid) {
+                console.log(values)
+                await postLoginData(values);
+            }
+        } catch (error) {
+            alert('Error in handleSubmit');
+        }
     }
 
     const formik = useFormik({
@@ -43,15 +67,15 @@ const Login: React.FC = () => {
         <Card title="Please Login To Continue" headStyle={{ textAlign: 'center' }} style={{ width: '60vw' }}>
             <Form onFinish={formik.handleSubmit}>
                 <Form.Item
-                    name="username"
-                    rules={[{ required: true, message: 'Please input your Username!' }]}
+                    name="email"
+                    rules={[{ required: true, message: 'Please input your Email!' }]}
                 >
                     <Input
                         prefix={<UserOutlined className="site-form-item-icon" />}
-                        placeholder="Username"
-                        value={formik.values.username}
-                        onChange={formik.handleChange('username')}
-                        status={formik.errors.username && 'error'}
+                        placeholder="Email"
+                        value={formik.values.email}
+                        onChange={formik.handleChange('email')}
+                        status={formik.errors.email && 'error'}
                     />
                 </Form.Item>
                 <Form.Item
@@ -66,11 +90,6 @@ const Login: React.FC = () => {
                         onChange={formik.handleChange('password')}
                         status={formik.errors.password && 'error'}
                     />
-                </Form.Item>
-                <Form.Item>
-                    {formik.errors.password && (
-                        <Text type='danger'>{formik.errors.password}</Text>
-                    )}
                 </Form.Item>
                 <Space direction="horizontal" size="middle" style={{ display: 'flex', justifyContent: 'space-around' }}>
                     <Button type="primary" htmlType="submit" className="login-form-button">
