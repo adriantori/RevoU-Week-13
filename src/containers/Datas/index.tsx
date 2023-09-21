@@ -1,22 +1,64 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button, Card, Space, Table } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { useNavigate } from 'react-router-dom';
 
-interface DataType {
+interface Category {
     key: string;
     id: string;
     name: string;
     is_active: boolean;
 }
 
+interface GetCategoryResponse {
+    categories:Category[],
+    currentPage: number,
+    totalItem: number,
+    totalPage: number
+}
+
+const data: Category[] = [
+    {
+        key: '0',
+        id: "ef2f13eb-a99c-4c0f-91c8-asdd33c390a3286",
+        name: "mock category A",
+        is_active: true,
+    },
+    {
+        key: '1',
+        id: "ef2f13eb-a99c-4c0f-91c8-d3qwe3c390a3286",
+        name: "mock category B",
+        is_active: false,
+    },
+    {
+        key: '2',
+        id: "ef2f13eb-a99c-4c0f-91c8-d3qwe3c390a3286",
+        name: "mock category B",
+        is_active: false,
+    },
+    {
+        key: '3',
+        id: "ef2f13eb-a99c-4c0f-91c8-d3qwe3c390a3286",
+        name: "mock category B",
+        is_active: false,
+    },
+    {
+        key: '4',
+        id: "ef2f13eb-a99c-4c0f-91c8-d3qwe3c390a3286",
+        name: "mock category B",
+        is_active: false,
+    },
+    {
+        key: '5',
+        id: "ef2f13eb-a99c-4c0f-91c8-d3qwe3c390a3286",
+        name: "mock category B",
+        is_active: false,
+    },
+];
+
 const Datas: React.FC = () => {
 
-    const deleteItem = (recordId: string) => {
-        console.log(recordId)
-    }
-
-    const columns: ColumnsType<DataType> = [
+    const columns: ColumnsType<Category> = [
         {
             title: 'ID',
             dataIndex: 'id',
@@ -57,61 +99,40 @@ const Datas: React.FC = () => {
         },
     ];
     
-    const data: DataType[] = [
-        {
-            key: '0',
-            id: "ef2f13eb-a99c-4c0f-91c8-asdd33c390a3286",
-            name: "mock category A",
-            is_active: true,
-        },
-        {
-            key: '1',
-            id: "ef2f13eb-a99c-4c0f-91c8-d3qwe3c390a3286",
-            name: "mock category B",
-            is_active: false,
-        },
-        {
-            key: '2',
-            id: "ef2f13eb-a99c-4c0f-91c8-d3qwe3c390a3286",
-            name: "mock category B",
-            is_active: false,
-        },
-        {
-            key: '3',
-            id: "ef2f13eb-a99c-4c0f-91c8-d3qwe3c390a3286",
-            name: "mock category B",
-            is_active: false,
-        },
-        {
-            key: '4',
-            id: "ef2f13eb-a99c-4c0f-91c8-d3qwe3c390a3286",
-            name: "mock category B",
-            is_active: false,
-        },
-        {
-            key: '5',
-            id: "ef2f13eb-a99c-4c0f-91c8-d3qwe3c390a3286",
-            name: "mock category B",
-            is_active: false,
-        },
-    ];
-
+    const [categories, setCategories] = useState<Category[]>([]);
     const navigate = useNavigate();
 
+    const getCategoryList = async () => {
+        const fetching = await fetch('https://mock-api.arikmpt.com/api/category')
+        const response: GetCategoryResponse = await fetching.json();
+        setCategories(response.categories ?? []);
+    }
+
+    useEffect(
+        () => {
+            getCategoryList()
+        },
+        []
+    )
+
+    const deleteItem = (recordId: string) => {
+        console.log(recordId);
+    }
+
     const logout = () => {
-        console.log("logged out")
+        console.log("logged out");
     }
 
     return (
         <Card title="List of Category" style={{ height: '82vh' }} extra={
             <Space direction="horizontal" size="middle">
                 <Button onClick={() => {navigate('/add')}}>Add Item</Button>
-                <Button onClick={logout}danger>Log Out</Button>
+                <Button onClick={logout} danger>Log Out</Button>
             </Space>
         }>
             <Table
                 columns={columns}
-                dataSource={data}
+                dataSource={categories}
                 pagination={{
                     defaultPageSize: 5,
                     total: data.length,
