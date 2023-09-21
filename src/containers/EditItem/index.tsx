@@ -27,7 +27,7 @@ const EditItem: React.FC = () => {
     const { token } = useContext(AppContext)
 
     if (!token) {
-        alert("Please login beforehand")
+        alert("Please login beforehand!")
         navigate('/login');
     }
 
