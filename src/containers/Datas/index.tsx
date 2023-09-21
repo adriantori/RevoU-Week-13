@@ -20,14 +20,11 @@ interface GetCategoryResponse {
 
 const Datas: React.FC = () => {
 
-    const { categories, setCategories } = useContext(AppContext);
+    const { categories, setCategories, setToken, token } = useContext(AppContext);
     const navigate = useNavigate();
 
     const getCategoryList = useCallback(
         async () => {
-            const token = localStorage.getItem('token');
-
-            // If token doesn't exist, redirect to login
             if (!token) {
                 alert("Please login beforehand")
                 navigate('/login');
@@ -40,13 +37,13 @@ const Datas: React.FC = () => {
             })
             const response: GetCategoryResponse = await fetching.json();
 
-            const categorizedData = response.data.map(category => ({
+            const categorizedData = response.data ? response.data.map(category => ({
                 ...category,
                 key: category.name
-            }));
+              })) : [];
             setCategories(categorizedData ?? []);
         },
-        [navigate, setCategories]
+        [navigate, setCategories, token]
     )
     useEffect(
         () => {
@@ -57,9 +54,6 @@ const Datas: React.FC = () => {
 
     const deleteItem = async (recordId: string) => {
         try {
-            const token = localStorage.getItem('token');
-
-            console.log(recordId);
             const fetching = await fetch(`https://mock-api.arikmpt.com/api/category/${recordId}`, {
                 method: 'DELETE',
                 headers: {
@@ -78,8 +72,8 @@ const Datas: React.FC = () => {
     }
 
     const handleLogout = () => {
-        alert("goodbye!")
-        localStorage.removeItem('token');
+        alert("goodbye!");
+        setToken(null);
         navigate('/login');
     }
 
@@ -116,7 +110,7 @@ const Datas: React.FC = () => {
             key: 'action',
             render: (_, record) => (
                 <Space size="middle">
-                    <a><Button type='primary' onClick={() => navigate(`/edit/${record.id}}`)}>Edit</Button></a>
+                    <a><Button type='primary' onClick={() => navigate(`/edit/${record.id}`)}>Edit</Button></a>
                     <a><Button type='primary' danger onClick={() => deleteItem(record.id)}>Delete</Button></a>
                 </Space>
             ),

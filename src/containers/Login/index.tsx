@@ -3,6 +3,8 @@ import { Button, Form, Input, Space, Card } from 'antd';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 import { useNavigate } from 'react-router-dom';
+import { useContext } from 'react';
+import { AppContext } from '../../Provider/AppProvider';
 
 interface AccountLogin {
     email: string;
@@ -22,6 +24,7 @@ const validationSchema = yup.object({
 const Login: React.FC = () => {
 
     const navigate = useNavigate();
+    const { setToken } = useContext(AppContext)
 
     async function postLoginData(values: AccountLogin) {
         try {
@@ -32,12 +35,14 @@ const Login: React.FC = () => {
                 },
                 body: JSON.stringify(values)
             });
-            console.log(fetching)
             if (!fetching.ok) {
                 throw new Error('Error login user');
             }
             const response = await fetching.json();
-            localStorage.setItem('token', response.data.token);
+
+            //localStorage.setItem('token',response.data.token)
+            setToken(response.data.token)
+
             alert('Login successful!');
             navigate('/');
         } catch (error) {
@@ -48,7 +53,6 @@ const Login: React.FC = () => {
     async function handleSubmit(values: AccountLogin) {
         try {
             if (formik.isValid) {
-                console.log(values)
                 await postLoginData(values);
             }
         } catch (error) {

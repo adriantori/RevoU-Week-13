@@ -21,7 +21,8 @@ const validationSchema = yup.object({
     email: yup.string()
         .email('Invalid email format')
         .matches(/^[^\s@]+@[^\s@]+\.[^\s@]+$/, 'Invalid email format. Must include domain.')
-        .required('Email must exist'),
+        .required('Email must exist')
+        .min(10),
     password: yup.string().required('Password must exist').min(8, 'Minimum of 8 characters')
 })
 
@@ -52,6 +53,8 @@ const Register: React.FC = () => {
         try {
             if (formik.isValid) {
                 await postRegisterData(values);
+            }else{
+                alert('your input probably wrong, try other stuff')
             }
         } catch (error) {
             console.error('Error in handleSubmit:', error);
@@ -98,8 +101,8 @@ const Register: React.FC = () => {
                 <Form.Item
                     name="password"
                     hasFeedback
-                    validateStatus={formik.touched.email && formik.errors.email ? 'error' : 'success'}
-                    help={formik.touched.email && formik.errors.email ? formik.errors.email : ''}
+                    validateStatus={formik.touched.password && formik.errors.password ? 'error' : 'success'}
+                    help={formik.touched.password && formik.errors.password ? formik.errors.password : ''}
                 >
                     <Input
                         prefix={<LockOutlined className="site-form-item-icon" />}

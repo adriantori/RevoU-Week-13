@@ -7,46 +7,59 @@ import { useContext } from 'react';
 
 interface AccountLogin {
     name: string;
-    status: string;
+    is_active: string;
 }
 
 const initialValues = {
     name: '',
-    status: ''
+    is_active: ''
 }
 
 const AddItem: React.FC = () => {
 
     const navigate = useNavigate();
+    const { isNameUnique, token } = useContext(AppContext);
     
-    const { isNameUnique } = useContext(AppContext);
-      
-    const handleSubmit = (values: AccountLogin) => {
-        console.log(values);
+    const handleSubmit = async (values: AccountLogin) => {
+        try {
+            const fetching = await fetch('https://mock-api.arikmpt.com/api/category/create', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(values)
+            });
+            if (!fetching.ok) {
+                throw new Error('Error adding category');
+            }
+            alert('Add category successful, feel free to go back to main menu');
+        } catch (error) {
+            console.error('Error adding data:', error);
+        }
     }
 
     const nameUniquenessValidation = async (name: string) => {
         return isNameUnique(name);
-      };
-      
-      const validationSchema = yup.object({
+    };
+
+    const validationSchema = yup.object({
         name: yup
-          .string()
-          .required('Name must exist')
-          .test('is-unique', 'Name must be unique', async function (value) {
-            if (!value) return false; 
-            const isUnique = await nameUniquenessValidation(value);
-            return isUnique;
-          }),
-        status: yup.string().required('Select one of the status'),
-      });
+            .string()
+            .required('Name must exist')
+            .test('is-unique', 'Name must be unique', async function (value) {
+                if (!value) return false;
+                const isUnique = await nameUniquenessValidation(value);
+                return isUnique;
+            }),
+        is_active: yup.string().required('Select one of the status'),
+    });
 
     const formik = useFormik({
         initialValues: initialValues,
         onSubmit: handleSubmit,
         validationSchema: validationSchema
     })
-
 
     return (
         <Card title="Add New Category" headStyle={{ textAlign: 'center' }}>
@@ -71,12 +84,12 @@ const AddItem: React.FC = () => {
                 >
                     <Select
                         placeholder="Status"
-                        value={formik.values.status}
-                        onChange={formik.handleChange('status')}
-                        status={formik.errors.status && 'error'}
+                        value={formik.values.is_active}
+                        onChange={formik.handleChange('is_active')}
+                        status={formik.errors.is_active && 'error'}
                     >
-                        <Select.Option value="active">Active</Select.Option>
-                        <Select.Option value="deactive">Deactive</Select.Option>
+                        <Select.Option value="true">Active</Select.Option>
+                        <Select.Option value="false">Deactive</Select.Option>
                     </Select>
                 </Form.Item>
                 <Space direction="horizontal" size="middle" style={{ display: 'flex', justifyContent: 'space-around', width: "100%" }}>
