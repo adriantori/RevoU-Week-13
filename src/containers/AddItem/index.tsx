@@ -35,7 +35,7 @@ const AddItem: React.FC = () => {
 
     return (
         <Card title="Add New Category" headStyle={{ textAlign: 'center' }}>
-            <a href="">Back to Main Page</a>
+            <a onClick={() => { navigate('/') }}>Back to Main Page</a>
             <Form onFinish={formik.handleSubmit}>
                 <Form.Item
                     name="name"
@@ -65,9 +65,6 @@ const AddItem: React.FC = () => {
                 <Space direction="horizontal" size="middle" style={{ display: 'flex', justifyContent: 'space-around', width: "100%" }}>
                     <Button type="primary" htmlType="submit" style={{ width: "200px" }}>
                         Submit
-                    </Button>
-                    <Button onClick={() => { navigate('/') }} danger style={{ width: "200px" }}>
-                        Return
                     </Button>
                 </Space>
             </Form>
