@@ -1,9 +1,12 @@
 import { Button, Form, Input, Space, Card, Select } from 'antd';
-import { useFormik } from 'formik';
 import { useNavigate } from 'react-router-dom';
 import * as yup from 'yup';
-import { AppContext } from '../../Provider/AppProvider';
 import { useContext } from 'react';
+import { useFormik } from 'formik';
+import { AppContext } from '../../Provider/AppProvider';
+import { Notification } from '../../components'
+import { useTokenChecker } from '../../hooks';
+
 
 interface AccountLogin {
     name: string;
@@ -18,7 +21,10 @@ const initialValues = {
 const AddItem: React.FC = () => {
 
     const navigate = useNavigate();
-    const { isNameUnique, token } = useContext(AppContext);
+    const { isNameUnique} = useContext(AppContext);
+    const token = localStorage.getItem('token')
+
+    useTokenChecker(token)
     
     const handleSubmit = async (values: AccountLogin) => {
         try {
@@ -33,7 +39,8 @@ const AddItem: React.FC = () => {
             if (!fetching.ok) {
                 throw new Error('Error adding category');
             }
-            alert('Add category successful, feel free to go back to main menu');
+            Notification('success', 'Add Category', 'Data successfully added');
+            navigate('/');
         } catch (error) {
             console.error('Error adding data:', error);
         }
@@ -47,7 +54,8 @@ const AddItem: React.FC = () => {
         name: yup
             .string()
             .required('Name must exist')
-            .test('is-unique', 'Name must be unique', async function (value) {
+            .test('is-unique', 'Name must be unique', 
+            async function (value) {
                 if (!value) return false;
                 const isUnique = await nameUniquenessValidation(value);
                 return isUnique;

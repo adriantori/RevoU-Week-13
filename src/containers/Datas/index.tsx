@@ -3,6 +3,8 @@ import { Button, Card, Space, Table } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { useNavigate } from 'react-router-dom';
 import { AppContext } from '../../Provider/AppProvider';
+import { Notification } from '../../components'
+import { useTokenChecker } from '../../hooks';
 
 interface Category {
     key: string;
@@ -20,16 +22,14 @@ interface GetCategoryResponse {
 
 const Datas: React.FC = () => {
 
-    const { categories, setCategories, setToken, token } = useContext(AppContext);
+    const { categories, setCategories } = useContext(AppContext);
     const navigate = useNavigate();
+    const token = localStorage.getItem('token');
+
+    useTokenChecker(token)
 
     const getCategoryList = useCallback(
         async () => {
-            if (!token) {
-                alert("Please login beforehand")
-                navigate('/login');
-            }
-
             const fetching = await fetch('https://mock-api.arikmpt.com/api/category', {
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -39,11 +39,11 @@ const Datas: React.FC = () => {
 
             const categorizedData = response.data ? response.data.map(category => ({
                 ...category,
-                key: category.name
-              })) : [];
+                key: category.id
+            })) : [];
             setCategories(categorizedData ?? []);
         },
-        [navigate, setCategories, token]
+        [setCategories, token]
     )
     useEffect(
         () => {
@@ -63,17 +63,19 @@ const Datas: React.FC = () => {
             if (!fetching.ok) {
                 throw new Error('Error deleting category');
             }
-            alert('Data deleted');
 
-            getCategoryList()
+            Notification('error', 'Deleted', 'Message is deleted')
+
+            getCategoryList();
         } catch (error) {
-            alert('Something gone wrong when you tried to annihilate the data');
+            Notification('error', 'Error delete Data', 'Something gone wrong when you tried to annihilate the data');
         }
     }
 
     const handleLogout = () => {
-        alert("goodbye!");
-        setToken(null);
+        Notification('success', 'Logout', 'Goodbye, see you later!');
+        localStorage.removeItem('token')
+        // setToken(null);
         navigate('/login');
     }
 

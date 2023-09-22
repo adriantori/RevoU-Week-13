@@ -4,32 +4,33 @@ import { useContext } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { AppContext } from '../../Provider/AppProvider';
 import * as yup from 'yup';
+import { Notification } from '../../components'
+import { useTokenChecker } from '../../hooks';
 
 interface AccountLogin {
-    name: string;
-    is_active: string;
+    name?: string;
+    is_active?: string;
 }
-
-const initialValues = {
-    name: '',
-    is_active: ''
-}
-
-const validationSchema = yup.object({
-    name: yup.string().required(),
-    is_active: yup.string().required(),
-})
 
 const EditItem: React.FC = () => {
 
     const navigate = useNavigate();
     const { id } = useParams();
-    const { token } = useContext(AppContext)
+    const { categories } = useContext(AppContext)
+    const token = localStorage.getItem('token')
+    useTokenChecker(token)
 
-    if (!token) {
-        alert("Please login beforehand!")
-        navigate('/login');
+    const category = categories.find(category => category.id === id);
+
+    const initialValues = {
+        name: category?.name,
+        is_active: category?.is_active ? "Active" : "Deactive"
     }
+    
+    const validationSchema = yup.object({
+        name: yup.string().required(),
+        is_active: yup.string().required(),
+    })
 
     const handleSubmit = async (values: AccountLogin) => {
         const newValues = {
@@ -47,8 +48,8 @@ const EditItem: React.FC = () => {
             if (!fetching.ok) {
                 throw new Error('Error adding category');
             }
-            alert('Edit successful!');
-            // navigate('/');
+                Notification('success', 'Edit data', 'Edit successful!');
+                navigate('/');
         } catch (error) {
             console.error('Error adding data:', error);
         }
@@ -67,24 +68,26 @@ const EditItem: React.FC = () => {
             <Form onFinish={formik.handleSubmit}>
                 <Form.Item
                     name="name"
-                    rules={[{ required: true, message: 'Name must exist' }]}
+                    rules={[{ required: true, message: 'Name must be different / exist' }]}
                 >
                     <Input
                         placeholder="Name"
                         value={formik.values.name}
                         onChange={formik.handleChange('name')}
                         status={formik.errors.name && 'error'}
+                        defaultValue={formik.initialValues.name}
                     />
                 </Form.Item>
                 <Form.Item
                     name="is_active"
-                    rules={[{ required: true, message: 'Select one of the status' }]}
+                    rules={[{ required: true, message: 'Status must be different / reselected' }]}
                 >
                     <Select
                         placeholder="Status"
                         value={formik.values.is_active}
                         onChange={formik.handleChange('is_active')}
                         status={formik.errors.is_active && 'error'}
+                        defaultValue={formik.initialValues.is_active}
                     >
                         <Select.Option value="true">Active</Select.Option>
                         <Select.Option value="false">Deactive</Select.Option>

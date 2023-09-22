@@ -3,6 +3,7 @@ import { Button, Form, Input, Space, Card } from 'antd';
 import { useFormik } from 'formik';
 import { useNavigate } from 'react-router-dom';
 import * as yup from 'yup';
+import { Notification } from '../../components'
 
 interface AccountRegister {
     name: string;
@@ -42,7 +43,7 @@ const Register: React.FC = () => {
             if (!fetching.ok) {
                 throw new Error('Error registering user');
             }
-            alert('Registration successful! Go ahead and login');
+            Notification('success', 'Register', 'Registration successful!');
             navigate('/login');
         } catch (error) {
             console.error('Error registering user:', error);
@@ -54,7 +55,7 @@ const Register: React.FC = () => {
             if (formik.isValid) {
                 await postRegisterData(values);
             }else{
-                alert('your input probably wrong, try other stuff')
+                Notification('error', 'Register error', 'Your input probably wrong, try other stuff');
             }
         } catch (error) {
             console.error('Error in handleSubmit:', error);
